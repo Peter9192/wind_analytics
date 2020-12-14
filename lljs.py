@@ -1,26 +1,4 @@
-""" Three routines to identify low-level jets in wind profiles:
-
-# 1. Simply loop over all profiles using np.apply_along_axis
-llj_strength = wspd.reduce(detect_llj,dim='level')
-
-# 2a. Fully vectorized function returning one llj characteristic at a time
-# Most generic, can still be optimized by returning multiple outputs at once.
-
-llj_strength = wspd.reduce(detect_llj_vectorized,dim='level',output='falloff')
-
-# 2b. Call multiple times to combine relevant data ######
-# Suboptimal, but xarray.DataArray.reduce only accepts single output arrays
-get_height = lambda i: np.where(i>0,wspd.level.values[i],np.nan)
-lljs = xr.merge([
-    wspd.reduce(detect_llj_vectorized,dim='level').rename('falloff'),
-    wspd.reduce(detect_llj_vectorized,dim='level',output='strength').rename('strength'),
-    wspd.reduce(detect_llj_vectorized,dim='level',output='index').rename('height')
-    ])
-lljs.height.values = lljs.height.pipe(get_height)
-
-# 3. High-level xarray implementation
-# This is fastest for my specific use case
-lljs = detect_llj_xarray(wspd)
+""" Identify low-level jets in wind profile data.
 
 Peter Kalverla
 December 2020
